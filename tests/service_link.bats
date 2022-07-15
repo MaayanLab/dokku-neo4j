@@ -63,21 +63,21 @@ teardown() {
   echo "status: $status"
   url=$(dokku config:get my-app DATABASE_URL)
   password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  assert_contains "$url" "postgres://postgres:$password@dokku-postgres-l:5432/l"
+  assert_contains "$url" "neo4j://neo4j:$password@dokku-neo4j-l:7474/l"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my-app
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:link) generates an alternate config url when DATABASE_URL already in use" {
-  dokku config:set my-app DATABASE_URL=postgres://user:pass@host:5432/db
+  dokku config:set my-app DATABASE_URL=neo4j://user:pass@host:7474/db
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my-app
   run dokku config my-app
-  assert_contains "${lines[*]}" "DOKKU_POSTGRES_AQUA_URL"
+  assert_contains "${lines[*]}" "DOKKU_NEO4J_AQUA_URL"
   assert_success
 
   dokku "$PLUGIN_COMMAND_PREFIX:link" m my-app
   run dokku config my-app
-  assert_contains "${lines[*]}" "DOKKU_POSTGRES_BLACK_URL"
+  assert_contains "${lines[*]}" "DOKKU_NEO4J_BLACK_URL"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" m my-app
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my-app
@@ -86,17 +86,17 @@ teardown() {
 @test "($PLUGIN_COMMAND_PREFIX:link) links to app with docker-options" {
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my-app
   run dokku docker-options:report my-app
-  assert_contains "${lines[*]}" "--link dokku.postgres.l:dokku-postgres-l"
+  assert_contains "${lines[*]}" "--link dokku.neo4j.l:dokku-neo4j-l"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my-app
 }
 
-@test "($PLUGIN_COMMAND_PREFIX:link) uses apps POSTGRES_DATABASE_SCHEME variable" {
-  dokku config:set my-app POSTGRES_DATABASE_SCHEME=postgres2
+@test "($PLUGIN_COMMAND_PREFIX:link) uses apps NEO4J_DATABASE_SCHEME variable" {
+  dokku config:set my-app NEO4J_DATABASE_SCHEME=neo4j2
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my-app
   url=$(dokku config:get my-app DATABASE_URL)
   password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  assert_contains "$url" "postgres2://postgres:$password@dokku-postgres-l:5432/l"
+  assert_contains "$url" "neo4j2://neo4j:$password@dokku-neo4j-l:7474/l"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my-app
 }
@@ -113,7 +113,7 @@ teardown() {
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my-app --alias "ALIAS"
   url=$(dokku config:get my-app ALIAS_URL)
   password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  assert_contains "$url" "postgres://postgres:$password@dokku-postgres-l:5432/l"
+  assert_contains "$url" "neo4j://neo4j:$password@dokku-neo4j-l:7474/l"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my-app
 }

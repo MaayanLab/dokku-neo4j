@@ -40,23 +40,23 @@ teardown() {
 
 @test "($PLUGIN_COMMAND_PREFIX:promote) changes DATABASE_URL" {
   password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  dokku config:set my-app "DATABASE_URL=postgres://u:p@host:5432/db" "DOKKU_POSTGRES_BLUE_URL=postgres://postgres:$password@dokku-postgres-l:5432/l"
+  dokku config:set my-app "DATABASE_URL=neo4j://u:p@host:7687/db" "DOKKU_NEO4J_BLUE_URL=neo4j://neo4j:$password@dokku-neo4j-l:7687/l"
   dokku "$PLUGIN_COMMAND_PREFIX:promote" l my-app
   url=$(dokku config:get my-app DATABASE_URL)
-  assert_equal "$url" "postgres://postgres:$password@dokku-postgres-l:5432/l"
+  assert_equal "$url" "neo4j://neo4j:$password@dokku-neo4j-l:7687/l"
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:promote) creates new config url when needed" {
   password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  dokku config:set my-app "DATABASE_URL=postgres://u:p@host:5432/db" "DOKKU_POSTGRES_BLUE_URL=postgres://postgres:$password@dokku-postgres-l:5432/l"
+  dokku config:set my-app "DATABASE_URL=neo4j://u:p@host:7687/db" "DOKKU_NEO4J_BLUE_URL=neo4j://neo4j:$password@dokku-neo4j-l:7687/l"
   dokku "$PLUGIN_COMMAND_PREFIX:promote" l my-app
   run dokku config my-app
-  assert_contains "${lines[*]}" "DOKKU_POSTGRES_"
+  assert_contains "${lines[*]}" "DOKKU_NEO4J_"
 }
-@test "($PLUGIN_COMMAND_PREFIX:promote) uses POSTGRES_DATABASE_SCHEME variable" {
+@test "($PLUGIN_COMMAND_PREFIX:promote) uses NEO4J_DATABASE_SCHEME variable" {
   password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  dokku config:set my-app "POSTGRES_DATABASE_SCHEME=postgres2" "DATABASE_URL=postgres://u:p@host:5432/db" "DOKKU_POSTGRES_BLUE_URL=postgres2://postgres:$password@dokku-postgres-l:5432/l"
+  dokku config:set my-app "NEO4J_DATABASE_SCHEME=neo4j2" "DATABASE_URL=neo4j://u:p@host:7687/db" "DOKKU_NEO4J_BLUE_URL=neo4j2://neo4j:$password@dokku-neo4j-l:7687/l"
   dokku "$PLUGIN_COMMAND_PREFIX:promote" l my-app
   url=$(dokku config:get my-app DATABASE_URL)
-  assert_contains "$url" "postgres2://postgres:$password@dokku-postgres-l:5432/l"
+  assert_contains "$url" "neo4j2://neo4j:$password@dokku-neo4j-l:7687/l"
 }

@@ -22,21 +22,21 @@ teardown() {
 @test "($PLUGIN_COMMAND_PREFIX:info) success" {
   run dokku "$PLUGIN_COMMAND_PREFIX:info" l
   local password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  assert_contains "${lines[*]}" "postgres://postgres:$password@dokku-postgres-l:5432/l"
+  assert_contains "${lines[*]}" "neo4j://neo4j:$password@dokku-neo4j-l:7687/l"
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:info) replaces underscores by dash in hostname" {
   dokku "$PLUGIN_COMMAND_PREFIX:create" test_with_underscores
   run dokku "$PLUGIN_COMMAND_PREFIX:info" test_with_underscores
   local password="$(sudo cat "$PLUGIN_DATA_ROOT/test_with_underscores/PASSWORD")"
-  assert_contains "${lines[*]}" "postgres://postgres:$password@dokku-postgres-test-with-underscores:5432/test_with_underscores"
+  assert_contains "${lines[*]}" "neo4j://neo4j:$password@dokku-neo4j-test-with-underscores:7687/test_with_underscores"
   dokku --force "$PLUGIN_COMMAND_PREFIX:destroy" test_with_underscores
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:info) success with flag" {
   run dokku "$PLUGIN_COMMAND_PREFIX:info" l --dsn
   local password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  assert_output "postgres://postgres:$password@dokku-postgres-l:5432/l"
+  assert_output "neo4j://neo4j:$password@dokku-neo4j-l:7687/l"
 
   run dokku "$PLUGIN_COMMAND_PREFIX:info" l --config-dir
   assert_success
