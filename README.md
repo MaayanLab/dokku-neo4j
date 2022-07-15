@@ -2,7 +2,7 @@
 
 A neo4j plugin for [Dokku](https://dokku.com/).
 
-Based off of the official postgres plugin for dokku. Currently defaults to installing [neo4j 4.4.8 community edition](https://hub.docker.com/_/neo4j/).
+Based off of the [official postgres plugin for dokku](https://github.com/dokku/dokku-postgres). Currently defaults to installing [neo4j 4.4.8 community edition](https://hub.docker.com/_/neo4j/).
 
 ## Requirements
 
