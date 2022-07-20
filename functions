@@ -113,10 +113,10 @@ service_export() {
   [[ -f "$SERVICE_ROOT/IMAGE_VERSION" ]] && PLUGIN_IMAGE_VERSION="$(cat "$SERVICE_ROOT/IMAGE_VERSION")"
 
   [[ -n $SSH_TTY ]] && stty -opost
-  docker stop "$SERVICE_NAME"
+  docker stop "$SERVICE_NAME" >/dev/null
   docker run -v "$SERVICE_HOST_ROOT/data:/data" -e "NEO4J_AUTH=neo4j/$PASSWORD" -e "NEO4J_PASSWORD=$PASSWORD" "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION" neo4j-admin dump --to=-
   status=$?
-  service_start "$SERVICE"
+  service_start "$SERVICE" >/dev/null
   [[ -n $SSH_TTY ]] && stty opost
   exit $status
 }
@@ -135,10 +135,10 @@ service_import() {
   if [[ -t 0 ]]; then
     dokku_log_fail "No data provided on stdin."
   fi
-  docker stop "$SERVICE_NAME"
+  docker stop "$SERVICE_NAME" >/dev/null
   docker run -v "$SERVICE_HOST_ROOT/data:/data" -e "NEO4J_AUTH=neo4j/$PASSWORD" -e "NEO4J_PASSWORD=$PASSWORD" "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION" neo4j-admin load --force --from=-
   status=$?
-  service_start "$SERVICE"
+  service_start "$SERVICE" >/dev/null
   exit $status
 }
 
