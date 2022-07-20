@@ -109,8 +109,10 @@ service_export() {
   local PASSWORD="$(service_password "$SERVICE")"
 
   [[ -n $SSH_TTY ]] && stty -opost
-  docker exec "$SERVICE_NAME" neo4j-admin dump --database=neo4j --to=neo4j.dump
+  docker stop "$SERVICE_NAME"
+  docker run "$SERVICE_NAME" neo4j-admin dump --database=neo4j --to=-
   status=$?
+  docker start "$SERVICE_NAME"
   [[ -n $SSH_TTY ]] && stty opost
   exit $status
 }
@@ -126,7 +128,11 @@ service_import() {
   if [[ -t 0 ]]; then
     dokku_log_fail "No data provided on stdin."
   fi
-  docker exec -i "$SERVICE_NAME" neo4j-admin load --database=neo4j --from=neo4j.dump
+  docker stop "$SERVICE_NAME"
+  docker run -i "$SERVICE_NAME" neo4j-admin load --database=neo4j --from=-
+  status=$?
+  docker start "$SERVICE_NAME"
+  exit $status
 }
 
 service_start() {
