@@ -116,7 +116,7 @@ service_export() {
   docker stop "$SERVICE_NAME"
   docker run -v "$SERVICE_HOST_ROOT/data:/data" -e "NEO4J_AUTH=neo4j/$PASSWORD" -e "NEO4J_PASSWORD=$PASSWORD" "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION" neo4j-admin dump --to=-
   status=$?
-  docker start "$SERVICE_NAME"
+  service_start "$SERVICE"
   [[ -n $SSH_TTY ]] && stty opost
   exit $status
 }
@@ -138,7 +138,7 @@ service_import() {
   docker stop "$SERVICE_NAME"
   docker run -v "$SERVICE_HOST_ROOT/data:/data" -e "NEO4J_AUTH=neo4j/$PASSWORD" -e "NEO4J_PASSWORD=$PASSWORD" "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION" neo4j-admin load --force --from=-
   status=$?
-  docker start "$SERVICE_NAME"
+  service_start "$SERVICE"
   exit $status
 }
 
