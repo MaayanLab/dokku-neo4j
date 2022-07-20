@@ -51,25 +51,25 @@ teardown() {
   run dokku "$PLUGIN_COMMAND_PREFIX:link" l my-app
   echo "output: $output"
   echo "status: $status"
-  assert_contains "${lines[*]}" "Already linked as DATABASE_URL"
+  assert_contains "${lines[*]}" "Already linked as NEO4J_URL"
   assert_failure
 
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my-app
 }
 
-@test "($PLUGIN_COMMAND_PREFIX:link) exports DATABASE_URL to app" {
+@test "($PLUGIN_COMMAND_PREFIX:link) exports NEO4J_URL to app" {
   run dokku "$PLUGIN_COMMAND_PREFIX:link" l my-app
   echo "output: $output"
   echo "status: $status"
-  url=$(dokku config:get my-app DATABASE_URL)
+  url=$(dokku config:get my-app NEO4J_URL)
   password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
   assert_contains "$url" "neo4j://neo4j:$password@dokku-neo4j-l:7474/l"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my-app
 }
 
-@test "($PLUGIN_COMMAND_PREFIX:link) generates an alternate config url when DATABASE_URL already in use" {
-  dokku config:set my-app DATABASE_URL=neo4j://user:pass@host:7474/db
+@test "($PLUGIN_COMMAND_PREFIX:link) generates an alternate config url when NEO4J_URL already in use" {
+  dokku config:set my-app NEO4J_URL=neo4j://user:pass@host:7474/db
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my-app
   run dokku config my-app
   assert_contains "${lines[*]}" "DOKKU_NEO4J_AQUA_URL"
@@ -94,7 +94,7 @@ teardown() {
 @test "($PLUGIN_COMMAND_PREFIX:link) uses apps NEO4J_DATABASE_SCHEME variable" {
   dokku config:set my-app NEO4J_DATABASE_SCHEME=neo4j2
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my-app
-  url=$(dokku config:get my-app DATABASE_URL)
+  url=$(dokku config:get my-app NEO4J_URL)
   password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
   assert_contains "$url" "neo4j2://neo4j:$password@dokku-neo4j-l:7474/l"
   assert_success
@@ -103,7 +103,7 @@ teardown() {
 
 @test "($PLUGIN_COMMAND_PREFIX:link) adds a querystring" {
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my-app --querystring "pool=5"
-  url=$(dokku config:get my-app DATABASE_URL)
+  url=$(dokku config:get my-app NEO4J_URL)
   assert_contains "$url" "?pool=5"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my-app

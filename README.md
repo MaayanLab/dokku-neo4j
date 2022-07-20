@@ -43,7 +43,7 @@ neo4j:linked <service> <app>                    # check if the neo4j service is 
 neo4j:links <service>                           # list all apps linked to the neo4j service
 neo4j:list                                      # list all neo4j services
 neo4j:logs <service> [-t|--tail] <tail-num-optional> # print the most recent log(s) for this service
-neo4j:promote <service> <app>                   # promote service <service> as DATABASE_URL in <app>
+neo4j:promote <service> <app>                   # promote service <service> as NEO4J_URL in <app>
 neo4j:restart <service>                         # graceful shutdown and restart of the neo4j service container
 neo4j:start <service>                           # start a previously stopped neo4j service
 neo4j:stop <service>                            # stop a running neo4j service
@@ -214,7 +214,7 @@ DOKKU_NEO4J_LOLLIPOP_PORT_7687_TCP_ADDR=172.17.0.1
 The following will be set on the linked application by default:
 
 ```
-DATABASE_URL=neo4j://lollipop:SOME_PASSWORD@dokku-neo4j-lollipop:7687/lollipop
+NEO4J_URL=neo4j://lollipop:SOME_PASSWORD@dokku-neo4j-lollipop:7687/lollipop
 ```
 
 The host exposed here only works internally in docker containers. If you want your container to be reachable from outside, you should use the `expose` subcommand. Another service can be linked to your app:
@@ -223,14 +223,14 @@ The host exposed here only works internally in docker containers. If you want yo
 dokku neo4j:link other_service playground
 ```
 
-It is possible to change the protocol for `DATABASE_URL` by setting the environment variable `NEO4J_DATABASE_SCHEME` on the app. Doing so will after linking will cause the plugin to think the service is not linked, and we advise you to unlink before proceeding.
+It is possible to change the protocol for `NEO4J_URL` by setting the environment variable `NEO4J_DATABASE_SCHEME` on the app. Doing so will after linking will cause the plugin to think the service is not linked, and we advise you to unlink before proceeding.
 
 ```shell
 dokku config:set playground NEO4J_DATABASE_SCHEME=neo4j2
 dokku neo4j:link lollipop playground
 ```
 
-This will cause `DATABASE_URL` to be set as:
+This will cause `NEO4J_URL` to be set as:
 
 ```
 neo4j2://lollipop:SOME_PASSWORD@dokku-neo4j-lollipop:7687/lollipop
@@ -323,7 +323,7 @@ Unexpose the service, removing access to it from the public interface (`0.0.0.0`
 dokku neo4j:unexpose lollipop
 ```
 
-### promote service <service> as DATABASE_URL in <app>
+### promote service <service> as NEO4J_URL in <app>
 
 ```shell
 # usage
@@ -344,10 +344,10 @@ You can promote the new service to be the primary one:
 dokku neo4j:promote other_service playground
 ```
 
-This will replace `DATABASE_URL` with the url from other_service and generate another environment variable to hold the previous value if necessary. You could end up with the following for example:
+This will replace `NEO4J_URL` with the url from other_service and generate another environment variable to hold the previous value if necessary. You could end up with the following for example:
 
 ```
-DATABASE_URL=neo4j://other_service:ANOTHER_PASSWORD@dokku-neo4j-other-service:7687/other_service
+NEO4J_URL=neo4j://other_service:ANOTHER_PASSWORD@dokku-neo4j-other-service:7687/other_service
 DOKKU_DATABASE_BLUE_URL=neo4j://other_service:ANOTHER_PASSWORD@dokku-neo4j-other-service:7687/other_service
 DOKKU_DATABASE_SILVER_URL=neo4j://lollipop:SOME_PASSWORD@dokku-neo4j-lollipop:7687/lollipop
 ```
