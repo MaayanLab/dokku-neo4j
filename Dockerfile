@@ -1,1 +1,1 @@
-FROM neo4j:4.19-community
+FROM neo4j:5.19-community
