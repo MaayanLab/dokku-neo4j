@@ -136,7 +136,7 @@ service_import() {
     dokku_log_fail "No data provided on stdin."
   fi
   docker stop "$SERVICE_NAME" >/dev/null
-  docker run -v "$SERVICE_HOST_ROOT/data:/data" -e "NEO4J_AUTH=neo4j/$PASSWORD" -e "DOKKU_NEO4J_PASSWORD=$PASSWORD" -i "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION" neo4j-admin database load --from-stdin neo4j
+  docker run -v "$SERVICE_HOST_ROOT/data:/data" -e "NEO4J_AUTH=neo4j/$PASSWORD" -e "DOKKU_NEO4J_PASSWORD=$PASSWORD" -i "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION" neo4j-admin database load --overwrite-destination=true --from-stdin neo4j
   status=$?
   service_start "$SERVICE" >/dev/null
   exit $status
