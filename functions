@@ -17,7 +17,7 @@ service_connect() {
   local SERVICE_TTY_OPTS
   has_tty && SERVICE_TTY_OPTS="-t"
 
-  docker exec --env=LANG=C.UTF-8 --env=LC_ALL=C.UTF-8 -i $SERVICE_TTY_OPTS "$SERVICE_NAME" cypher-shell -u neo4j -p "$NEO4J_PASSWORD"
+  docker exec --env=LANG=C.UTF-8 --env=LC_ALL=C.UTF-8 -i $SERVICE_TTY_OPTS "$SERVICE_NAME" cypher-shell -u neo4j -p "$DOKKU_NEO4J_PASSWORD"
 }
 
 service_create() {
@@ -87,7 +87,7 @@ service_create_container() {
   [[ -f "$SERVICE_ROOT/IMAGE_VERSION" ]] && PLUGIN_IMAGE_VERSION="$(cat "$SERVICE_ROOT/IMAGE_VERSION")"
 
   # shellcheck disable=SC2086
-  ID=$(docker run --name "$SERVICE_NAME" $MEMORY_LIMIT $SHM_SIZE -v "$SERVICE_HOST_ROOT/data:/data" -e "NEO4J_AUTH=neo4j/$PASSWORD" -e "NEO4J_PASSWORD=$PASSWORD" --env-file="$SERVICE_ROOT/ENV" -d --restart always --label dokku=service --label dokku.service=neo4j "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION" $CONFIG_OPTIONS)
+  ID=$(docker run --name "$SERVICE_NAME" $MEMORY_LIMIT $SHM_SIZE -v "$SERVICE_HOST_ROOT/data:/data" -e "NEO4J_AUTH=neo4j/$PASSWORD" -e "DOKKU_NEO4J_PASSWORD=$PASSWORD" --env-file="$SERVICE_ROOT/ENV" -d --restart always --label dokku=service --label dokku.service=neo4j "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION" $CONFIG_OPTIONS)
   echo "$ID" >"$SERVICE_ROOT/ID"
 
   dokku_log_verbose_quiet "Waiting for container to be ready"
@@ -114,7 +114,7 @@ service_export() {
 
   [[ -n $SSH_TTY ]] && stty -opost
   docker stop "$SERVICE_NAME" >/dev/null
-  docker run -v "$SERVICE_HOST_ROOT/data:/data" -e "NEO4J_AUTH=neo4j/$PASSWORD" -e "NEO4J_PASSWORD=$PASSWORD" "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION" neo4j-admin database dump --to-stdout neo4j
+  docker run -v "$SERVICE_HOST_ROOT/data:/data" -e "NEO4J_AUTH=neo4j/$PASSWORD" -e "DOKKU_NEO4J_PASSWORD=$PASSWORD" "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION" neo4j-admin database dump --to-stdout neo4j
   status=$?
   service_start "$SERVICE" >/dev/null
   [[ -n $SSH_TTY ]] && stty opost
@@ -136,7 +136,7 @@ service_import() {
     dokku_log_fail "No data provided on stdin."
   fi
   docker stop "$SERVICE_NAME" >/dev/null
-  docker run -v "$SERVICE_HOST_ROOT/data:/data" -e "NEO4J_AUTH=neo4j/$PASSWORD" -e "NEO4J_PASSWORD=$PASSWORD" -i "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION" neo4j-admin database load --overwrite-destination=true --from-stdin neo4j
+  docker run -v "$SERVICE_HOST_ROOT/data:/data" -e "NEO4J_AUTH=neo4j/$PASSWORD" -e "DOKKU_NEO4J_PASSWORD=$PASSWORD" -i "$PLUGIN_IMAGE:$PLUGIN_IMAGE_VERSION" neo4j-admin database load --overwrite-destination=true --from-stdin neo4j
   status=$?
   service_start "$SERVICE" >/dev/null
   exit $status
